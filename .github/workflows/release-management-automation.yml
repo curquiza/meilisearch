@@ -1,0 +1,40 @@
+name: Automate some steps of release management
+# No git flow handled here
+
+on:
+  milestone:
+    types: [created]
+
+jobs:
+  get-release-version:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Get Milestones title, so the release version
+        run:
+          echo ::set-output name=version::XXX
+      - name: Check if this release is a patch release only
+        run:
+          echo ${{ steps.get-release-version.outputs.version }}
+          echo ::set-output name=patch::true
+
+  create-roadmap-issue:
+    needs: get-release-version
+    runs-on: ubuntu-latest
+    # Create the roadmap issue if the release is not only a patch release
+    if: steps.get-release-version.outputs.patch == 'false'
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Download the issue template
+        run: curl -s https://raw.githubusercontent.com/meilisearch/core-team/main/issue-templates/roadmap-issue.md
+      - name: Replace <<version>> by the release version in the template
+        run:
+          sed ...
+      - name: Create the issue
+        run: gh issue create --title "Upgrade dependencies" --label "dependencies,maintenance" --body-file ".github/ISSUE_TEMPLATE/update_dependencies.md"
+
+# create-roadmap-issue:
+# create-label:
+# labalize-issues: when closing -> open an issue
