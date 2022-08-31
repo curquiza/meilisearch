@@ -25,20 +25,21 @@ jobs:
   create-roadmap-issue:
     needs: get-release-version
     # Create the roadmap issue if the release is not only a patch release
-    if: needs.get-release-version.outputs.patch == 'false'
+    # if: needs.get-release-version.outputs.patch == 'false'
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       MILESTONES_VERSION: ${{ github.event.milestone.title }}
     steps:
       - uses: actions/checkout@v3
+      - run: echo ${{ needs.get-release-version.outputs.patch }}
       - name: Download the issue template
-        run: curl -s https://raw.githubusercontent.com/meilisearch/core-team/main/issue-templates/roadmap-issue.md
+        run: curl -s https://raw.githubusercontent.com/meilisearch/core-team/main/issue-templates/roadmap-issue.md > roadmap-issue-template.md
       # - name: Replace <<version>> by the release version in the template
       #   run: |
       #     sed ...
-      - name: Create the issue
-        run: gh issue create --title "Upgrade dependencies" --label "dependencies,maintenance" --body-file ".github/ISSUE_TEMPLATE/update_dependencies.md"
+      # - name: Create the issue
+      #   run: gh issue create --title "Upgrade dependencies" --label "dependencies,maintenance" --body-file ".github/ISSUE_TEMPLATE/update_dependencies.md"
 
 # create-roadmap-issue:
 # create-label:
