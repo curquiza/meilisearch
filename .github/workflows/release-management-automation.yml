@@ -10,28 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Dump GitHub context
-        id: github_context_step
-        run: echo '${{ toJSON(github) }}'
-      - name: Dump job context
-        run: echo '${{ toJSON(job) }}'
-      - name: Dump steps context
-        run: echo '${{ toJSON(steps) }}'
-      - name: Dump runner context
-        run: echo '${{ toJSON(runner) }}'
-      - name: Dump strategy context
-        run: echo '${{ toJSON(strategy) }}'
-      - name: Dump matrix context
-        run: echo '${{ toJSON(matrix) }}'
-      # - name: Get Milestones title, so the release version
-      #   run:
-      #     echo "github"
-      #     echo ${{ toJSON(github) }}
-      #     echo "env"
-      #     echo ${{ toJSON(env) }}
-      #     echo "job"
-      #     echo ${{ toJSON(job) }}
-      #     echo ::set-output name=version::XXX
+      - name: Get Milestones title, so the release version
+        run:
+          echo ${{ github.event.title }}
+          echo ::set-output name=version::XXX
       # - name: Check if this release is a patch release only
       #   run:
       #     echo ${{ steps.get-release-version.outputs.version }}
