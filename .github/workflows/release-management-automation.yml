@@ -50,6 +50,8 @@ jobs:
       - name: Replace all empty occurences in the templates
         run: |
           sed -i "s/<<version>>/$MILESTONE_VERSION/g" $ISSUE_TEMPLATE
+          echo "lol"
+          echo $MILESTONE_URL
           sed -i "s/<<milestone_url>>/$MILESTONE_URL/g" $ISSUE_TEMPLATE
           if [[ ! -z $MILESTONE_DUE_ON ]]; then
             date=$(echo $MILESTONE_DUE_ON | cut -d 'T' -f 1)
