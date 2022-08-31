@@ -8,16 +8,17 @@ on:
 jobs:
   get-release-version:
     runs-on: ubuntu-latest
+    env:
+      MILESTONES_VERSION: ${{ github.event.milestone.title }}
     steps:
       - uses: actions/checkout@v3
-      - name: Get Milestones title, so the release version
+      - name: Check if this release is a patch release only
         run:
-          echo ${{ github.event.milestone.title }}
-          echo ::set-output name=version::XXX
-      # - name: Check if this release is a patch release only
-      #   run:
-      #     echo ${{ steps.get-release-version.outputs.version }}
-      #     echo ::set-output name=patch::true
+          if [[ $MILESTONES_VERSION =~ ^v[0-9]+\.[0-9]+\.0$ ]]; then
+            echo ::set-output name=patch::true
+          else
+            echo ::set-output name=patch::false
+          fi
 
   # create-roadmap-issue:
   #   needs: get-release-version
@@ -26,6 +27,7 @@ jobs:
   #   if: steps.get-release-version.outputs.patch == 'false'
   #   env:
   #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #     MILESTONES_VERSION: ${{ github.event.milestone.title }}
   #   steps:
   #     - uses: actions/checkout@v3
   #     - name: Download the issue template
