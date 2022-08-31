@@ -47,11 +47,11 @@ jobs:
       - run: echo ${{ needs.get-release-version.outputs.is-patch }}
       - name: Download the issue template
         run: curl -s https://raw.githubusercontent.com/meilisearch/core-team/main/issue-templates/roadmap-issue.md > $ISSUE_TEMPLATE
-          # sed -i "s/<<milestones\_url>>/$MILESTONES_URL/g" $ISSUE_TEMPLATE
+          # sed -i "s/<<milestone\_url>>/$MILESTONES_URL/g" $ISSUE_TEMPLATE
       - name: Replace all empty occurences in the templates
         run: |
           sed -i "s/<<version>>/$MILESTONE_VERSION/g" $ISSUE_TEMPLATE
-          if [[ ! -z $MILESTONE_DUE_ON ]]
+          if [[ ! -z $MILESTONE_DUE_ON ]]; then
             date=$($MILESTONE_DUE_ON | cut -d 'T' -f 1)
             sed -i "s/Release date\: 20XX-XX-XX/Release date\: $date/g" $ISSUE_TEMPLATE
           fi
