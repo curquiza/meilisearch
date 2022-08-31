@@ -52,7 +52,7 @@ jobs:
         run: |
           sed -i "s/<<version>>/$MILESTONE_VERSION/g" $ISSUE_TEMPLATE
           if [[ ! -z $MILESTONE_DUE_ON ]]; then
-            date=$($MILESTONE_DUE_ON | cut -d 'T' -f 1)
+            date=$(echo $MILESTONE_DUE_ON | cut -d 'T' -f 1)
             sed -i "s/Release date\: 20XX-XX-XX/Release date\: $date/g" $ISSUE_TEMPLATE
           fi
       - name: Create the issue
