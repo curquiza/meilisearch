@@ -54,8 +54,8 @@ jobs:
           gh issue create \
             --title 'Write release'
             --label 'epic,impacts docs, impacts integrations, impacts cloud' \
-            --body-file $ISSUE_TEMPLATE \
-            --milestone $MILESTONES_VERSION
+            --body $(cat $ISSUE_TEMPLATE) \
+            --milestone $MILESTONES_VERSION \
             --assignee curquiza
 
 # create-roadmap-issue:
