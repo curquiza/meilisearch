@@ -47,13 +47,13 @@ jobs:
       - run: echo ${{ needs.get-release-version.outputs.is-patch }}
       - name: Download the issue template
         run: curl -s https://raw.githubusercontent.com/meilisearch/core-team/main/issue-templates/roadmap-issue.md > $ISSUE_TEMPLATE
+        # if [[ ! -z $MILESTONES_DUE_ON ]]
+        #   sed -i "s/Release date\: 20XX-XX-XX/Release date\: $MILESTONES_DUE_ON/g" $ISSUE_TEMPLATE
+        # fi
       - name: Replace all empty occurences in the templates
         run: |
           sed -i "s/<<version>>/$MILESTONES_VERSION/g" $ISSUE_TEMPLATE
           sed -i "s/<<milestones_url>>/$MILESTONES_URL/g" $ISSUE_TEMPLATE
-    # if [[ ! -z $MILESTONES_DUE_ON ]]
-    #   sed -i "s/Release date\: 20XX-XX-XX/Release date\: $MILESTONES_DUE_ON/g" $ISSUE_TEMPLATE
-    # fi
       - name: Create the issue
         run: |
           gh issue create \
