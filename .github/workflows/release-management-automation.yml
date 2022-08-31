@@ -15,8 +15,10 @@ jobs:
       - name: Check if this release is a patch release only
         run: |
           if [[ $MILESTONES_VERSION =~ ^v[0-9]+\.[0-9]+\.0$ ]]; then
+            echo 'This is NOT a patch release'
             echo ::set-output name=patch::false
           else
+            echo 'This is a patch release'
             echo ::set-output name=patch::true
           fi
 
