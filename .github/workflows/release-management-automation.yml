@@ -41,13 +41,14 @@ jobs:
       ISSUE_TEMPLATE: roadmap-issue-template.md
       MILESTONES_VERSION: ${{ github.event.milestone.title }}
       MILESTONES_URL: ${{ github.event.milestone.html_url }}
-      MILESTONES_DUE_ON: ${{ github.event.milestone.due_on | cut -d 'T' -f 1 }}
+      MILESTONES_DUE_ON: ${{ github.event.milestone.due_on }}
     steps:
       - uses: actions/checkout@v3
       - run: echo ${{ needs.get-release-version.outputs.is-patch }}
       - name: Download the issue template
         run: curl -s https://raw.githubusercontent.com/meilisearch/core-team/main/issue-templates/roadmap-issue.md > $ISSUE_TEMPLATE
         # if [[ ! -z $MILESTONES_DUE_ON ]]
+        #  | cut -d 'T' -f 1
         #   sed -i "s/Release date\: 20XX-XX-XX/Release date\: $MILESTONES_DUE_ON/g" $ISSUE_TEMPLATE
         # fi
       - name: Replace all empty occurences in the templates
