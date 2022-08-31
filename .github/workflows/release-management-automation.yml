@@ -49,10 +49,14 @@ jobs:
         run: curl -s https://raw.githubusercontent.com/meilisearch/core-team/main/issue-templates/roadmap-issue.md > $ISSUE_TEMPLATE
       - name: Replace all empty occurences in the templates
         run: |
+          # Replace all <<version>> occurences
           sed -i "s/<<version>>/$MILESTONE_VERSION/g" $ISSUE_TEMPLATE
-          echo "lol"
-          echo $MILESTONE_URL
-          sed -i "s/<<milestone_url>>/$MILESTONE_URL/g" $ISSUE_TEMPLATE
+
+          # Replace all <<milestone_id>> occurences
+          milestone_id=$(echo $MILESTONE_URL | cut -d 'milestone/' -f 2)
+          sed -i "s/<<milestone_url>>/$milestone_id/g" $ISSUE_TEMPLATE
+
+          # Replace release date if exists
           if [[ ! -z $MILESTONE_DUE_ON ]]; then
             date=$(echo $MILESTONE_DUE_ON | cut -d 'T' -f 1)
             sed -i "s/Release date\: 20XX-XX-XX/Release date\: $date/g" $ISSUE_TEMPLATE
