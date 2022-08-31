@@ -36,23 +36,28 @@ jobs:
     if: needs.get-release-version.outputs.is-patch == 'false'
     runs-on: ubuntu-latest
     env:
+      # GH_TOKEN: ${{ secrets.MEILI_BOT_GH_PAT }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      MILESTONES_VERSION: ${{ github.event.milestone.title }}
       ISSUE_TEMPLATE: roadmap-issue-template.md
+      MILESTONES_VERSION: ${{ github.event.milestone.title }}
+      MILESTONES_URL: ${{ github.event.milestone.html_url }}
+      MILESTONES_DUE_ON: ${{ github.event.milestone.due_on }}
     steps:
       - uses: actions/checkout@v3
       - run: echo ${{ needs.get-release-version.outputs.is-patch }}
       - name: Download the issue template
         run: curl -s https://raw.githubusercontent.com/meilisearch/core-team/main/issue-templates/roadmap-issue.md > $ISSUE_TEMPLATE
-      - name: Replace all <<version>> occurences $MILESTONES_VERSION in the template
+      - name: Replace all empty occurences in the templates
         run: |
           sed -i "s/<<version>>/$MILESTONES_VERSION/g" $ISSUE_TEMPLATE
-          ls -la
-          cat roadmap-issue-template.md
+          sed -i "s/<<milestones_url>>/$MILESTONES_URL/g" $ISSUE_TEMPLATE
+          if [[ ! -z $MILESTONES_DUE_ON ]]
+            sed -i "s/Release date: 20XX-XX-XX/Release date:$MILESTONES_DUE_ON/g" $ISSUE_TEMPLATE
+          fi
       - name: Create the issue
         run: |
           gh issue create \
-            --title 'Write release' \
+            --title 'Create release changelogs for $MILESTONES_VERSION' \
             --label 'epic,impacts docs,impacts integrations,impacts cloud' \
             --body-file $ISSUE_TEMPLATE \
             --milestone $MILESTONES_VERSION \
