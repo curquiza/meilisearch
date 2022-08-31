@@ -8,19 +8,22 @@ on:
 jobs:
   get-release-version:
     runs-on: ubuntu-latest
+    outputs:
+      is-patch: ${{ steps.check-patch.outputs.is-patch }}
     env:
       MILESTONES_VERSION: ${{ github.event.milestone.title }}
     steps:
       - uses: actions/checkout@v3
       - name: Check if this release is a patch release only
+        id: check-patch
         run: |
           echo version: $MILESTONES_VERSION
           if [[ $MILESTONES_VERSION =~ ^v[0-9]+\.[0-9]+\.0$ ]]; then
             echo 'This is NOT a patch release'
-            echo ::set-output name=patch::false
+            echo ::set-output name=is-patch::false
           elif [[ $MILESTONES_VERSION =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo 'This is a patch release'
-            echo ::set-output name=patch::true
+            echo ::set-output name=is-patch::true
           else
             echo 'Not a valid format of release, check the Milestones title.'
             echo 'Should be vX.Y.Z'
@@ -30,21 +33,29 @@ jobs:
   create-roadmap-issue:
     needs: get-release-version
     # Create the roadmap issue if the release is not only a patch release
-    # if: needs.get-release-version.outputs.patch == 'false'
+    if: needs.get-release-version.outputs.is-patch == 'false'
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       MILESTONES_VERSION: ${{ github.event.milestone.title }}
+      ISSUE_TEMPLATE: roadmap-issue-template.md
     steps:
       - uses: actions/checkout@v3
-      - run: echo ${{ needs.get-release-version.outputs.patch }}
+      - run: echo ${{ needs.get-release-version.outputs.is-patch }}
       - name: Download the issue template
-        run: curl -s https://raw.githubusercontent.com/meilisearch/core-team/main/issue-templates/roadmap-issue.md > roadmap-issue-template.md
-      # - name: Replace <<version>> by the release version in the template
-      #   run: |
-      #     sed ...
-      # - name: Create the issue
-      #   run: gh issue create --title "Upgrade dependencies" --label "dependencies,maintenance" --body-file ".github/ISSUE_TEMPLATE/update_dependencies.md"
+        run: curl -s https://raw.githubusercontent.com/meilisearch/core-team/main/issue-templates/roadmap-issue.md > $ISSUE_TEMPLATE
+      - name: Replace all <<version>> occurences $MILESTONES_VERSION in the template
+        run: |
+          sed -i "s/<<version>>/$MILESTONES_VERSION/g" $ISSUE_TEMPLATE
+          cat roadmap-issue-template.md
+      - name: Create the issue
+        run: |
+          gh issue create \
+            --title 'Write release'
+            --label 'epic,impacts docs, impacts integrations, impacts cloud' \
+            --body-file $ISSUE_TEMPLATE \
+            --milestone $MILESTONES_VERSION
+            --assignee curquiza
 
 # create-roadmap-issue:
 # create-label:
