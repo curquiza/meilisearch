@@ -40,17 +40,17 @@ jobs:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       ISSUE_TEMPLATE: roadmap-issue-template.md
       MILESTONE_VERSION: ${{ github.event.milestone.title }}
-      MILESTONES_URL: ${{ github.event.milestone.html_url }}
+      MILESTONE_URL: ${{ github.event.milestone.html_url }}
       MILESTONE_DUE_ON: ${{ github.event.milestone.due_on }}
     steps:
       - uses: actions/checkout@v3
       - run: echo ${{ needs.get-release-version.outputs.is-patch }}
       - name: Download the issue template
         run: curl -s https://raw.githubusercontent.com/meilisearch/core-team/main/issue-templates/roadmap-issue.md > $ISSUE_TEMPLATE
-          # sed -i "s/<<milestone\_url>>/$MILESTONES_URL/g" $ISSUE_TEMPLATE
       - name: Replace all empty occurences in the templates
         run: |
           sed -i "s/<<version>>/$MILESTONE_VERSION/g" $ISSUE_TEMPLATE
+          sed -i "s/<<milestone_url>>/$MILESTONE_URL/g" $ISSUE_TEMPLATE
           if [[ ! -z $MILESTONE_DUE_ON ]]; then
             date=$(echo $MILESTONE_DUE_ON | cut -d 'T' -f 1)
             sed -i "s/Release date\: 20XX-XX-XX/Release date\: $date/g" $ISSUE_TEMPLATE
