@@ -41,7 +41,7 @@ jobs:
       ISSUE_TEMPLATE: roadmap-issue-template.md
       MILESTONES_VERSION: ${{ github.event.milestone.title }}
       MILESTONES_URL: ${{ github.event.milestone.html_url }}
-      MILESTONES_DUE_ON: ${{ github.event.milestone.due_on }}
+      MILESTONES_DUE_ON: ${{ github.event.milestone.due_on | cut -d 'T' -f 1 }}
     steps:
       - uses: actions/checkout@v3
       - run: echo ${{ needs.get-release-version.outputs.is-patch }}
@@ -51,9 +51,9 @@ jobs:
         run: |
           sed -i "s/<<version>>/$MILESTONES_VERSION/g" $ISSUE_TEMPLATE
           sed -i "s/<<milestones_url>>/$MILESTONES_URL/g" $ISSUE_TEMPLATE
-          if [[ ! -z $MILESTONES_DUE_ON ]]
-            sed -i "s/Release date: 20XX-XX-XX/Release date:$MILESTONES_DUE_ON/g" $ISSUE_TEMPLATE
-          fi
+    # if [[ ! -z $MILESTONES_DUE_ON ]]
+    #   sed -i "s/Release date\: 20XX-XX-XX/Release date\: $MILESTONES_DUE_ON/g" $ISSUE_TEMPLATE
+    # fi
       - name: Create the issue
         run: |
           gh issue create \
