@@ -24,22 +24,22 @@ jobs:
           echo ${{ steps.get-release-version.outputs.version }}
           echo ::set-output name=patch::true
 
-  create-roadmap-issue:
-    needs: get-release-version
-    runs-on: ubuntu-latest
-    # Create the roadmap issue if the release is not only a patch release
-    if: steps.get-release-version.outputs.patch == 'false'
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - uses: actions/checkout@v3
-      - name: Download the issue template
-        run: curl -s https://raw.githubusercontent.com/meilisearch/core-team/main/issue-templates/roadmap-issue.md
-      - name: Replace <<version>> by the release version in the template
-        run:
-          sed ...
-      - name: Create the issue
-        run: gh issue create --title "Upgrade dependencies" --label "dependencies,maintenance" --body-file ".github/ISSUE_TEMPLATE/update_dependencies.md"
+  # create-roadmap-issue:
+  #   needs: get-release-version
+  #   runs-on: ubuntu-latest
+  #   # Create the roadmap issue if the release is not only a patch release
+  #   if: steps.get-release-version.outputs.patch == 'false'
+  #   env:
+  #     GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Download the issue template
+  #       run: curl -s https://raw.githubusercontent.com/meilisearch/core-team/main/issue-templates/roadmap-issue.md
+  #     - name: Replace <<version>> by the release version in the template
+  #       run:
+  #         sed ...
+  #     - name: Create the issue
+  #       run: gh issue create --title "Upgrade dependencies" --label "dependencies,maintenance" --body-file ".github/ISSUE_TEMPLATE/update_dependencies.md"
 
 # create-roadmap-issue:
 # create-label:
