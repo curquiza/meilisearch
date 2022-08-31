@@ -53,7 +53,7 @@ jobs:
           sed -i "s/<<version>>/$MILESTONE_VERSION/g" $ISSUE_TEMPLATE
 
           # Replace all <<milestone_id>> occurences
-          milestone_id=$(echo $MILESTONE_URL | cut -d 'milestone/' -f 2)
+          milestone_id=$(echo $MILESTONE_URL | cut -d '/' -f 7)
           sed -i "s/<<milestone_url>>/$milestone_id/g" $ISSUE_TEMPLATE
 
           # Replace release date if exists
