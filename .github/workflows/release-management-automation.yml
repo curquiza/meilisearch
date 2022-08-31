@@ -54,7 +54,7 @@ jobs:
 
           # Replace all <<milestone_id>> occurences
           milestone_id=$(echo $MILESTONE_URL | cut -d '/' -f 7)
-          sed -i "s/<<milestone_url>>/$milestone_id/g" $ISSUE_TEMPLATE
+          sed -i "s/<<milestone_id>>/$milestone_id/g" $ISSUE_TEMPLATE
 
           # Replace release date if exists
           if [[ ! -z $MILESTONE_DUE_ON ]]; then
