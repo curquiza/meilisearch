@@ -54,7 +54,7 @@ jobs:
           gh issue create
             --title 'Write release'
             --label 'epic,impacts docs, impacts integrations, impacts cloud'
-            --body $ISSUE_TEMPLATE
+            --body-file $ISSUE_TEMPLATE
             --milestone $MILESTONES_VERSION
             --assignee curquiza
 
