@@ -51,11 +51,11 @@ jobs:
           cat roadmap-issue-template.md
       - name: Create the issue
         run: |
-          gh issue create \
+          gh issue create
             --title 'Write release'
-            --label 'epic,impacts docs, impacts integrations, impacts cloud' \
-            --body $(cat $ISSUE_TEMPLATE) \
-            --milestone $MILESTONES_VERSION \
+            --label 'epic,impacts docs, impacts integrations, impacts cloud'
+            --body $ISSUE_TEMPLATE
+            --milestone $MILESTONES_VERSION
             --assignee curquiza
 
 # create-roadmap-issue:
