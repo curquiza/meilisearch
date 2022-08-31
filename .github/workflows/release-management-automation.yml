@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Get Milestones title, so the release version
         run:
-          echo ${{ github.event.milestones.title }}
+          echo ${{ github.event.milestone.title }}
           echo ::set-output name=version::XXX
       # - name: Check if this release is a patch release only
       #   run:
