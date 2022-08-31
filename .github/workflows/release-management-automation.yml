@@ -51,10 +51,10 @@ jobs:
         #  | cut -d 'T' -f 1
         #   sed -i "s/Release date\: 20XX-XX-XX/Release date\: $MILESTONES_DUE_ON/g" $ISSUE_TEMPLATE
         # fi
+          # sed -i "s/<<milestones_url>>/$MILESTONES_URL/g" $ISSUE_TEMPLATE
       - name: Replace all empty occurences in the templates
         run: |
           sed -i "s/<<version>>/$MILESTONES_VERSION/g" $ISSUE_TEMPLATE
-          sed -i "s/<<milestones_url>>/$MILESTONES_URL/g" $ISSUE_TEMPLATE
       - name: Create the issue
         run: |
           gh issue create \
