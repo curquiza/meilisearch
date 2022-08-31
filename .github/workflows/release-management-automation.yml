@@ -23,7 +23,7 @@ jobs:
   create-roadmap-issue:
     needs: get-release-version
     # Create the roadmap issue if the release is not only a patch release
-    if: steps.get-release-version.outputs.patch == 'false'
+    if: needs.get-release-version.outputs.patch == 'false'
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
