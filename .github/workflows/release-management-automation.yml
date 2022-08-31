@@ -11,17 +11,17 @@ jobs:
     outputs:
       is-patch: ${{ steps.check-patch.outputs.is-patch }}
     env:
-      MILESTONES_VERSION: ${{ github.event.milestone.title }}
+      MILESTONE_VERSION: ${{ github.event.milestone.title }}
     steps:
       - uses: actions/checkout@v3
       - name: Check if this release is a patch release only
         id: check-patch
         run: |
-          echo version: $MILESTONES_VERSION
-          if [[ $MILESTONES_VERSION =~ ^v[0-9]+\.[0-9]+\.0$ ]]; then
+          echo version: $MILESTONE_VERSION
+          if [[ $MILESTONE_VERSION =~ ^v[0-9]+\.[0-9]+\.0$ ]]; then
             echo 'This is NOT a patch release'
             echo ::set-output name=is-patch::false
-          elif [[ $MILESTONES_VERSION =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          elif [[ $MILESTONE_VERSION =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
             echo 'This is a patch release'
             echo ::set-output name=is-patch::true
           else
@@ -39,29 +39,29 @@ jobs:
       # GH_TOKEN: ${{ secrets.MEILI_BOT_GH_PAT }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       ISSUE_TEMPLATE: roadmap-issue-template.md
-      MILESTONES_VERSION: ${{ github.event.milestone.title }}
+      MILESTONE_VERSION: ${{ github.event.milestone.title }}
       MILESTONES_URL: ${{ github.event.milestone.html_url }}
-      MILESTONES_DUE_ON: ${{ github.event.milestone.due_on }}
+      MILESTONE_DUE_ON: ${{ github.event.milestone.due_on }}
     steps:
       - uses: actions/checkout@v3
       - run: echo ${{ needs.get-release-version.outputs.is-patch }}
       - name: Download the issue template
         run: curl -s https://raw.githubusercontent.com/meilisearch/core-team/main/issue-templates/roadmap-issue.md > $ISSUE_TEMPLATE
+          # sed -i "s/<<milestones\_url>>/$MILESTONES_URL/g" $ISSUE_TEMPLATE
       - name: Replace all empty occurences in the templates
         run: |
-          sed -i "s/<<version>>/$MILESTONES_VERSION/g" $ISSUE_TEMPLATE
-          sed -i "s/<<milestones\_url>>/$MILESTONES_URL/g" $ISSUE_TEMPLATE
-          if [[ ! -z $MILESTONES_DUE_ON ]]
-            date=$($MILESTONES_DUE_ON | cut -d 'T' -f 1)
+          sed -i "s/<<version>>/$MILESTONE_VERSION/g" $ISSUE_TEMPLATE
+          if [[ ! -z $MILESTONE_DUE_ON ]]
+            date=$($MILESTONE_DUE_ON | cut -d 'T' -f 1)
             sed -i "s/Release date\: 20XX-XX-XX/Release date\: $date/g" $ISSUE_TEMPLATE
           fi
       - name: Create the issue
         run: |
           gh issue create \
-            --title "Create release changelogs for $MILESTONES_VERSION" \
+            --title "Create release changelogs for $MILESTONE_VERSION" \
             --label 'epic,impacts docs,impacts integrations,impacts cloud' \
             --body-file $ISSUE_TEMPLATE \
-            --milestone $MILESTONES_VERSION \
+            --milestone $MILESTONE_VERSION \
             --assignee curquiza
 
 # create-roadmap-issue:
