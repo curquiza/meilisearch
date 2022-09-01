@@ -91,9 +91,9 @@ jobs:
           # Replace release date if exists
           if [[ ! -z $MILESTONE_DUE_ON ]]; then
             date=$(echo $MILESTONE_DUE_ON | cut -d 'T' -f 1)
-            sed -i "s/on <<milestone_due_on>>/on $date/g" $ISSUE_TEMPLATE
+            sed -i "s/ on <<milestone_due_on>>/on $date/g" $ISSUE_TEMPLATE
           else
-            sed -i "s/on <<milestone_due_on>>//g" $ISSUE_TEMPLATE
+            sed -i "s/ on <<milestone_due_on>>//g" $ISSUE_TEMPLATE
           fi
       - name: Create the issue
         run: |
