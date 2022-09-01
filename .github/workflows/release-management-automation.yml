@@ -38,7 +38,7 @@ jobs:
     env:
       # GH_TOKEN: ${{ secrets.MEILI_BOT_GH_PAT }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      ISSUE_TEMPLATE: roadmap-issue-template.md
+      ISSUE_TEMPLATE: issue-template.md
       MILESTONE_VERSION: ${{ github.event.milestone.title }}
       MILESTONE_URL: ${{ github.event.milestone.html_url }}
       MILESTONE_DUE_ON: ${{ github.event.milestone.due_on }}
@@ -64,12 +64,48 @@ jobs:
       - name: Create the issue
         run: |
           gh issue create \
-            --title "Create release changelogs for $MILESTONE_VERSION" \
+            --title "$MILESTONE_VERSION ROADMAP" \
             --label 'epic,impacts docs,impacts integrations,impacts cloud' \
+            --body-file $ISSUE_TEMPLATE \
+            --milestone $MILESTONE_VERSION
+
+  create-changelog-issue:
+    needs: get-release-version
+    # Create the changelog issue if the release is not only a patch release
+    if: needs.get-release-version.outputs.is-patch == 'false'
+    runs-on: ubuntu-latest
+    env:
+      # GH_TOKEN: ${{ secrets.MEILI_BOT_GH_PAT }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      ISSUE_TEMPLATE: issue-template.md
+      MILESTONE_VERSION: ${{ github.event.milestone.title }}
+      MILESTONE_DUE_ON: ${{ github.event.milestone.due_on }}
+    steps:
+      - uses: actions/checkout@v3
+      - run: echo ${{ needs.get-release-version.outputs.is-patch }}
+      - name: Download the issue template
+        run: curl -s https://raw.githubusercontent.com/meilisearch/core-team/main/issue-templates/changelog-issue.md > $ISSUE_TEMPLATE
+      - name: Replace all empty occurences in the templates
+        run: |
+          # Replace all <<version>> occurences
+          sed -i "s/<<version>>/$MILESTONE_VERSION/g" $ISSUE_TEMPLATE
+
+          # Replace release date if exists
+          if [[ ! -z $MILESTONE_DUE_ON ]]; then
+            date=$(echo $MILESTONE_DUE_ON | cut -d 'T' -f 1)
+            sed -i "s/\(<<milestone_due_on>>\)/\($date\)/g" $ISSUE_TEMPLATE
+          else
+            sed -i "s/\(<<milestone_due_on>>\)//g" $ISSUE_TEMPLATE
+          fi
+      - name: Create the issue
+        run: |
+          gh issue create \
+            --title "Create release changelogs for $MILESTONE_VERSION" \
+            --label 'impacts docs,documentation' \
             --body-file $ISSUE_TEMPLATE \
             --milestone $MILESTONE_VERSION \
             --assignee curquiza
 
-# create-roadmap-issue:
+
 # create-label:
-# labalize-issues: when closing -> open an issue
+# labalize-issues: when closing -> open an issue. if: github.event.actions == 'created'
