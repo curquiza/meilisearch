@@ -104,7 +104,7 @@ jobs:
             --milestone $MILESTONE_VERSION \
             --assignee curquiza
 
-create-release-label:
+  create-release-label:
     needs: get-release-version
     runs-on: ubuntu-latest
     env:
