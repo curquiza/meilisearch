@@ -44,7 +44,6 @@ jobs:
       MILESTONE_DUE_ON: ${{ github.event.milestone.due_on }}
     steps:
       - uses: actions/checkout@v3
-      - run: echo ${{ needs.get-release-version.outputs.is-patch }}
       - name: Download the issue template
         run: curl -s https://raw.githubusercontent.com/meilisearch/core-team/main/issue-templates/roadmap-issue.md > $ISSUE_TEMPLATE
       - name: Replace all empty occurences in the templates
@@ -82,7 +81,6 @@ jobs:
       MILESTONE_DUE_ON: ${{ github.event.milestone.due_on }}
     steps:
       - uses: actions/checkout@v3
-      - run: echo ${{ needs.get-release-version.outputs.is-patch }}
       - name: Download the issue template
         run: curl -s https://raw.githubusercontent.com/meilisearch/core-team/main/issue-templates/changelog-issue.md > $ISSUE_TEMPLATE
       - name: Replace all empty occurences in the templates
@@ -106,6 +104,23 @@ jobs:
             --milestone $MILESTONE_VERSION \
             --assignee curquiza
 
-
-# create-label:
+create-release-label:
+    needs: get-release-version
+    runs-on: ubuntu-latest
+    env:
+      # GH_TOKEN: ${{ secrets.MEILI_BOT_GH_PAT }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      MILESTONE_VERSION: ${{ github.event.milestone.title }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Create the $MILESTONE_VERSION label
+        # gh api repos/meilisearch/meilisearch/labels
+        run: |
+          gh api repos/curquiza/meilisearch/labels
+            --method POST \
+            -H "Accept: application/vnd.github+json" \
+            -f name="$MILESTONE_VERSION" \
+            -f description="PRs/issues solved in $MILESTONE_VERSION" \
+            -f color='ff5ba3'
 # labalize-issues: when closing -> open an issue. if: github.event.actions == 'created'
+
