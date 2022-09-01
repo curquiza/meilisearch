@@ -25,7 +25,7 @@ jobs:
             echo 'This is a patch release'
             echo ::set-output name=is-patch::true
           else
-            echo 'Not a valid format of release, check the Milestone's title.'
+            echo "Not a valid format of release, check the Milestone's title."
             echo 'Should be vX.Y.Z'
             exit 1
           fi
