@@ -25,7 +25,7 @@ jobs:
             echo 'This is a patch release'
             echo ::set-output name=is-patch::true
           else
-            echo 'Not a valid format of release, check the Milestones title.'
+            echo 'Not a valid format of release, check the Milestone's title.'
             echo 'Should be vX.Y.Z'
             exit 1
           fi
@@ -91,9 +91,9 @@ jobs:
           # Replace release date if exists
           if [[ ! -z $MILESTONE_DUE_ON ]]; then
             date=$(echo $MILESTONE_DUE_ON | cut -d 'T' -f 1)
-            sed -i "s/\(<<milestone_due_on>>\)/\($date\)/g" $ISSUE_TEMPLATE
+            sed -i "s/on <<milestone_due_on>>/on $date/g" $ISSUE_TEMPLATE
           else
-            sed -i "s/\(<<milestone_due_on>>\)//g" $ISSUE_TEMPLATE
+            sed -i "s/on <<milestone_due_on>>//g" $ISSUE_TEMPLATE
           fi
       - name: Create the issue
         run: |
