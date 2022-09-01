@@ -78,7 +78,7 @@ jobs:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       ISSUE_TEMPLATE: issue-template.md
       MILESTONE_VERSION: ${{ github.event.milestone.title }}
-      MILESTONE_DUE_ON: ${{ github.event.milestone.due_on }}
+      MILESTONE_URL: ${{ github.event.milestone.html_url }}
     steps:
       - uses: actions/checkout@v3
       - name: Download the issue template
@@ -88,13 +88,9 @@ jobs:
           # Replace all <<version>> occurences
           sed -i "s/<<version>>/$MILESTONE_VERSION/g" $ISSUE_TEMPLATE
 
-          # Replace release date if exists
-          if [[ ! -z $MILESTONE_DUE_ON ]]; then
-            date=$(echo $MILESTONE_DUE_ON | cut -d 'T' -f 1)
-            sed -i "s/ on <<milestone_due_on>>/ on $date/g" $ISSUE_TEMPLATE
-          else
-            sed -i "s/ on <<milestone_due_on>>//g" $ISSUE_TEMPLATE
-          fi
+          # Replace all <<milestone_id>> occurences
+          milestone_id=$(echo $MILESTONE_URL | cut -d '/' -f 7)
+          sed -i "s/<<milestone_id>>/$milestone_id/g" $ISSUE_TEMPLATE
       - name: Create the issue
         run: |
           gh issue create \
@@ -114,7 +110,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Create the $MILESTONE_VERSION label
-        # gh api repos/meilisearch/meilisearch/labels
         run: |
           gh api repos/curquiza/meilisearch/labels \
             --method POST \
@@ -122,5 +117,8 @@ jobs:
             -f name="$MILESTONE_VERSION" \
             -f description="PRs/issues solved in $MILESTONE_VERSION" \
             -f color='ff5ba3'
+
+
+
 # labalize-issues: when closing -> open an issue. if: github.event.actions == 'created'
 
