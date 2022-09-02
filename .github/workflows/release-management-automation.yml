@@ -16,7 +16,7 @@ on:
 
 jobs:
   get-release-version:
-    if: github.event.actions == 'created'
+    if: github.event.action == 'created'
     runs-on: ubuntu-latest
     outputs:
       is-patch: ${{ steps.check-patch.outputs.is-patch }}
