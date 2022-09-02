@@ -15,6 +15,11 @@ on:
     types: [created, closed]
 
 jobs:
+
+# -----------------
+# MILESTONE CREATED
+# -----------------
+
   get-release-version:
     if: github.event.action == 'created'
     runs-on: ubuntu-latest
@@ -110,6 +115,10 @@ jobs:
             --milestone $MILESTONE_VERSION \
             --assignee curquiza
 
+# ----------------
+# MILESTONE CLOSED
+# ----------------
+
   create-release-label:
     if: github.event.action == 'closed'
     runs-on: ubuntu-latest
@@ -125,7 +134,7 @@ jobs:
           label_description="PRs/issues solved in $MILESTONE_VERSION"
           if [[ ! -z $MILESTONE_DUE_ON ]]; then
             date=$(echo $MILESTONE_DUE_ON | cut -d 'T' -f 1)
-            label_description=$label_description + "released on $date"
+            label_description="$label_description released on $date"
           fi
 
           gh api repos/curquiza/meilisearch/labels \
