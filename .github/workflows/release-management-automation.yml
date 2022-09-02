@@ -137,7 +137,7 @@ jobs:
 
   labelize-all-issues:
     if: github.event.actions == 'closed'
-    needs: create-labels
+    needs: create-release-label
     runs-on: ubuntu-latest
     env:
       # GH_TOKEN: ${{ secrets.MEILI_BOT_GH_PAT }}
