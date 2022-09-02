@@ -44,7 +44,7 @@ jobs:
           # author_name: Meili-Bot
           # author_email: robot@meilisearch.com
           message: "Update version for the next release ($NEW_VERSION) in Cargo.toml files"
-          new_branch: update-version-$NEW_VERSION
+          new_branch: update-version-{{ $NEW_VERSION }}
       - name: Create the PR
         run: |
           gh pr create \
