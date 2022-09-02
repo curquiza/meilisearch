@@ -28,7 +28,8 @@ jobs:
         run: cargo install sd
       - name: Update files
         run: |
-          new_string="version = \"$NEW_VERSION\""
+          raw_new_version=$(echo $NEW_VERSION | cut -d 'v' -f 2)
+          new_string="version = \"$raw_new_version\""
           sd 'version = "0.29.0"' "$new_string" */Cargo.toml
       - name: Build Meilisearch
         run: cargo build
