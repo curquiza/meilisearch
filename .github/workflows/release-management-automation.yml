@@ -154,15 +154,15 @@ jobs:
       MILESTONE_VERSION: ${{ github.event.milestone.title }}
     steps:
       - uses: actions/checkout@v3
-      - name: All label $MILESTONE_VERSION to all issues/PRs in the Milestones
+      - name: Add label $MILESTONE_VERSION to all PRs in the Milestones
         run: |
           # Update all PRs
           prs=$(gh pr list --search milestone:"$MILESTONE_VERSION" --limit 1000 --state all --json number --template '{{range .}}{{tablerow (printf "%v" .number)}}{{end}}')
           for pr in $prs; do
               gh pr $pr edit --label $MILESTONE_VERSION
           done
-
-          # Update all issues
+      - name: Add label $MILESTONE_VERSION to all issues in the Milestones
+        run: |
           prs=$(gh issue list --search milestone:"$MILESTONE_VERSION" --limit 1000 --state all --json number --template '{{range .}}{{tablerow (printf "%v" .number)}}{{end}}')
           for pr in $prs; do
               gh issue $pr edit --label $MILESTONE_VERSION
