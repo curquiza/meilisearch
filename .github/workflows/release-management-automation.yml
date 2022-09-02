@@ -163,7 +163,7 @@ jobs:
           done
       - name: Add label $MILESTONE_VERSION to all issues in the Milestones
         run: |
-          prs=$(gh issue list --search milestone:"$MILESTONE_VERSION" --limit 1000 --state all --json number --template '{{range .}}{{tablerow (printf "%v" .number)}}{{end}}')
-          for pr in $prs; do
-              gh issue $pr edit --add-label $MILESTONE_VERSION
+          issues=$(gh issue list --search milestone:"$MILESTONE_VERSION" --limit 1000 --state all --json number --template '{{range .}}{{tablerow (printf "%v" .number)}}{{end}}')
+          for issue in $issues; do
+              gh issue edit $issue --add-label $MILESTONE_VERSION
           done
