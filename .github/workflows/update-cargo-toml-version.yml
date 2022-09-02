@@ -1,0 +1,31 @@
+name: Update Meilisearch version in different Cargo.toml files
+
+on:
+  workflow_dispatch:
+    inputs:
+      new_version:
+        description: 'The new version'
+        required: true
+
+env:
+  NEW_VERSION: ${{ github.event.inputs.new_version }}
+
+jobs:
+
+  get-release-version:
+    runs-on: ubuntu-latest
+    env:
+      # GH_TOKEN: ${{ secrets.MEILI_BOT_GH_PAT }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Update files
+        run: |
+          git checkout
+      - name: Commits and push the changes
+        run: |
+          echo 'ici2'
+      - name: Create the PR
+        run: |
+          gh pr create
+
