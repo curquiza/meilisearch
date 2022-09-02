@@ -145,13 +145,13 @@ jobs:
       - uses: actions/checkout@v3
       - name: Add label $MILESTONE_VERSION to all PRs in the Milestones
         run: |
-          prs=$(gh pr list --search milestone:"$MILESTONE_VERSION" --limit 1000 --state all --json number --template '{{range .}}{{tablerow (printf "%v" .number)}}{{end}}')
+          prs=$(gh pr list --milestone $MILESTONE_VERSION --limit 1000 --state all --json number --template '{{range .}}{{tablerow (printf "%v" .number)}}{{end}}')
           for pr in $prs; do
               gh pr $pr edit --add-label $MILESTONE_VERSION
           done
       - name: Add label $MILESTONE_VERSION to all issues in the Milestones
         run: |
-          issues=$(gh issue list --search milestone:"$MILESTONE_VERSION" --limit 1000 --state all --json number --template '{{range .}}{{tablerow (printf "%v" .number)}}{{end}}')
+          issues=$(gh issue list --milestone $MILESTONE_VERSION --limit 1000 --state all --json number --template '{{range .}}{{tablerow (printf "%v" .number)}}{{end}}')
           for issue in $issues; do
               gh issue edit $issue --add-label $MILESTONE_VERSION
           done
