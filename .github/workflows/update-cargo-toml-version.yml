@@ -1,4 +1,4 @@
-name: Update Meilisearch version in different Cargo.toml files
+name: Update Meilisearch version in all Cargo.toml files
 
 on:
   workflow_dispatch:
@@ -20,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Install sd
-        run: apt install sd
+        run: sudo apt-get install -y sd
       - name: Update files
           sd 'version = "0.29.0"' 'version = "0.30.0"' */Cargo.toml
         run: |
