@@ -1,12 +1,22 @@
 name: Automate some steps of release management
-# No git flow handled here
+
+# /!\ No git flow are handled here
+
+# For each Milestone created (not opened!), and if the release is NOT a patch release (only the patch changed)
+# - the roadmap issue is created, see https://github.com/meilisearch/core-team/blob/main/issue-templates/roadmap-issue.md
+# - the changelog issue is created, see https://github.com/meilisearch/core-team/blob/main/issue-templates/changelog-issue.md
+
+# For each Milestone closed
+# - the `release_version` label is created
+# - this labeled is applied to all issues/PRs in the Milestone
 
 on:
   milestone:
-    types: [created]
+    types: [created, closed]
 
 jobs:
   get-release-version:
+    if: github.event.actions == 'created'
     runs-on: ubuntu-latest
     outputs:
       is-patch: ${{ steps.check-patch.outputs.is-patch }}
@@ -33,7 +43,7 @@ jobs:
   create-roadmap-issue:
     needs: get-release-version
     # Create the roadmap issue if the release is not only a patch release
-    if: needs.get-release-version.outputs.is-patch == 'false'
+    if: github.event.actions == 'created' && needs.get-release-version.outputs.is-patch == 'false'
     runs-on: ubuntu-latest
     env:
       # GH_TOKEN: ${{ secrets.MEILI_BOT_GH_PAT }}
@@ -71,7 +81,7 @@ jobs:
   create-changelog-issue:
     needs: get-release-version
     # Create the changelog issue if the release is not only a patch release
-    if: needs.get-release-version.outputs.is-patch == 'false'
+    if: github.event.actions == 'created' && needs.get-release-version.outputs.is-patch == 'false'
     runs-on: ubuntu-latest
     env:
       # GH_TOKEN: ${{ secrets.MEILI_BOT_GH_PAT }}
@@ -101,7 +111,33 @@ jobs:
             --assignee curquiza
 
   create-release-label:
-    needs: get-release-version
+    if: github.event.actions == 'closed'
+    runs-on: ubuntu-latest
+    env:
+      # GH_TOKEN: ${{ secrets.MEILI_BOT_GH_PAT }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      MILESTONE_VERSION: ${{ github.event.milestone.title }}
+      MILESTONE_DUE_ON: ${{ github.event.milestone.due_on }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Create the $MILESTONE_VERSION label
+        run: |
+          label_description="PRs/issues solved in $MILESTONE_VERSION"
+          if [[ ! -z $MILESTONE_DUE_ON ]]; then
+            date=$(echo $MILESTONE_DUE_ON | cut -d 'T' -f 1)
+            label_description=$label_description + "released on $date"
+          fi
+
+          gh api repos/curquiza/meilisearch/labels \
+            --method POST \
+            -H "Accept: application/vnd.github+json" \
+            -f name="$MILESTONE_VERSION" \
+            -f description="$label_description" \
+            -f color='ff5ba3'
+
+  labelize-all-issues:
+    if: github.event.actions == 'closed'
+    needs: create-labels
     runs-on: ubuntu-latest
     env:
       # GH_TOKEN: ${{ secrets.MEILI_BOT_GH_PAT }}
@@ -109,16 +145,16 @@ jobs:
       MILESTONE_VERSION: ${{ github.event.milestone.title }}
     steps:
       - uses: actions/checkout@v3
-      - name: Create the $MILESTONE_VERSION label
+      - name: All label $MILESTONE_VERSION to all issues/PRs in the Milestones
         run: |
-          gh api repos/curquiza/meilisearch/labels \
-            --method POST \
-            -H "Accept: application/vnd.github+json" \
-            -f name="$MILESTONE_VERSION" \
-            -f description="PRs/issues solved in $MILESTONE_VERSION" \
-            -f color='ff5ba3'
+          # Update all PRs
+          prs=$(gh pr list --search milestone:"$MILESTONE_VERSION" --limit 1000 --state all --json number --template '{{range .}}{{tablerow (printf "%v" .number)}}{{end}}')
+          for pr in $prs; do
+              gh pr $pr edit --label $MILESTONE_VERSION
+          done
 
-
-
-# labalize-issues: when closing -> open an issue. if: github.event.actions == 'created'
-
+          # Update all issues
+          prs=$(gh issue list --search milestone:"$MILESTONE_VERSION" --limit 1000 --state all --json number --template '{{range .}}{{tablerow (printf "%v" .number)}}{{end}}')
+          for pr in $prs; do
+              gh issue $pr edit --label $MILESTONE_VERSION
+          done
