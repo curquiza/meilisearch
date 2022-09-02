@@ -8,7 +8,7 @@ name: Automate some steps of release management
 
 # For each Milestone closed
 # - the `release_version` label is created
-# - this labeled is applied to all issues/PRs in the Milestone
+# - this label is applied to all issues/PRs in the Milestone
 
 on:
   milestone:
@@ -51,8 +51,7 @@ jobs:
     if: github.event.action == 'created' && needs.get-release-version.outputs.is-patch == 'false'
     runs-on: ubuntu-latest
     env:
-      # GH_TOKEN: ${{ secrets.MEILI_BOT_GH_PAT }}
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_TOKEN: ${{ secrets.MEILI_BOT_GH_PAT }}
       ISSUE_TEMPLATE: issue-template.md
       MILESTONE_VERSION: ${{ github.event.milestone.title }}
       MILESTONE_URL: ${{ github.event.milestone.html_url }}
@@ -89,8 +88,7 @@ jobs:
     if: github.event.action == 'created' && needs.get-release-version.outputs.is-patch == 'false'
     runs-on: ubuntu-latest
     env:
-      # GH_TOKEN: ${{ secrets.MEILI_BOT_GH_PAT }}
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_TOKEN: ${{ secrets.MEILI_BOT_GH_PAT }}
       ISSUE_TEMPLATE: issue-template.md
       MILESTONE_VERSION: ${{ github.event.milestone.title }}
       MILESTONE_URL: ${{ github.event.milestone.html_url }}
@@ -123,8 +121,7 @@ jobs:
     if: github.event.action == 'closed'
     runs-on: ubuntu-latest
     env:
-      # GH_TOKEN: ${{ secrets.MEILI_BOT_GH_PAT }}
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_TOKEN: ${{ secrets.MEILI_BOT_GH_PAT }}
       MILESTONE_VERSION: ${{ github.event.milestone.title }}
       MILESTONE_DUE_ON: ${{ github.event.milestone.due_on }}
     steps:
@@ -149,14 +146,12 @@ jobs:
     needs: create-release-label
     runs-on: ubuntu-latest
     env:
-      # GH_TOKEN: ${{ secrets.MEILI_BOT_GH_PAT }}
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_TOKEN: ${{ secrets.MEILI_BOT_GH_PAT }}
       MILESTONE_VERSION: ${{ github.event.milestone.title }}
     steps:
       - uses: actions/checkout@v3
       - name: Add label $MILESTONE_VERSION to all PRs in the Milestones
         run: |
-          # Update all PRs
           prs=$(gh pr list --search milestone:"$MILESTONE_VERSION" --limit 1000 --state all --json number --template '{{range .}}{{tablerow (printf "%v" .number)}}{{end}}')
           for pr in $prs; do
               gh pr $pr edit --add-label $MILESTONE_VERSION
