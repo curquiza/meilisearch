@@ -46,12 +46,12 @@ jobs:
           message: "Update version for the next release ($NEW_VERSION) in Cargo.toml files"
           new_branch: update-version-$NEW_VERSION
       - name: Create the PR
-      # --milestone $NEW_VERSION
         run: |
           gh pr create \
-            --title "Update version for the next release ($NEW_VERSION) in Cargo.toml files"
-            --body '⚠️ This PR is automatically generated. Check the new version is the expected one before merging.'
-            --label 'skip changelog'
+            --title "Update version for the next release ($NEW_VERSION) in Cargo.toml files" \
+            --body '⚠️ This PR is automatically generated. Check the new version is the expected one before merging.' \
+            --label 'skip changelog' \
+            --milestone $NEW_VERSION
 
 # TODO
 # - regexp (\w+)
