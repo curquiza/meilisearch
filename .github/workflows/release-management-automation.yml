@@ -43,7 +43,7 @@ jobs:
   create-roadmap-issue:
     needs: get-release-version
     # Create the roadmap issue if the release is not only a patch release
-    if: github.event.actions == 'created' && needs.get-release-version.outputs.is-patch == 'false'
+    if: github.event.action == 'created' && needs.get-release-version.outputs.is-patch == 'false'
     runs-on: ubuntu-latest
     env:
       # GH_TOKEN: ${{ secrets.MEILI_BOT_GH_PAT }}
@@ -81,7 +81,7 @@ jobs:
   create-changelog-issue:
     needs: get-release-version
     # Create the changelog issue if the release is not only a patch release
-    if: github.event.actions == 'created' && needs.get-release-version.outputs.is-patch == 'false'
+    if: github.event.action == 'created' && needs.get-release-version.outputs.is-patch == 'false'
     runs-on: ubuntu-latest
     env:
       # GH_TOKEN: ${{ secrets.MEILI_BOT_GH_PAT }}
@@ -111,7 +111,7 @@ jobs:
             --assignee curquiza
 
   create-release-label:
-    if: github.event.actions == 'closed'
+    if: github.event.action == 'closed'
     runs-on: ubuntu-latest
     env:
       # GH_TOKEN: ${{ secrets.MEILI_BOT_GH_PAT }}
@@ -136,7 +136,7 @@ jobs:
             -f color='ff5ba3'
 
   labelize-all-issues:
-    if: github.event.actions == 'closed'
+    if: github.event.action == 'closed'
     needs: create-release-label
     runs-on: ubuntu-latest
     env:
