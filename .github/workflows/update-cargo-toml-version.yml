@@ -31,8 +31,8 @@ jobs:
           raw_new_version=$(echo $NEW_VERSION | cut -d 'v' -f 2)
           new_string="version = \"$raw_new_version\""
           sd '^version = "\d+.\d+.\w+"$' "$new_string" */Cargo.toml
-      # - name: Build Meilisearch to update Cargo.lock
-      #   run: cargo build
+      - name: Build Meilisearch to update Cargo.lock
+        run: cargo build
       - name: Commits and push the changes
         run: |
           git checkout -b "update-version-$NEW_VERSION"
@@ -41,8 +41,8 @@ jobs:
           git push origin "update-version-$NEW_VERSION"
       - uses: EndBug/add-and-commit@v9
         with:
-          # author_name: Meili-Bot
-          # author_email: robot@meilisearch.com
+          author_name: Meili-Bot
+          author_email: ${{ secrets.MEILI_BOT_EMAIL }}
           message: "Update version for the next release ($NEW_VERSION) in Cargo.toml files"
           new_branch: update-version-{{ $NEW_VERSION }}
       - name: Create the PR
@@ -52,7 +52,3 @@ jobs:
             --body '⚠️ This PR is automatically generated. Check the new version is the expected one before merging.' \
             --label 'skip changelog' \
             --milestone $NEW_VERSION
-
-# TODO
-# - regexp (\w+)
-# - gh PR create
