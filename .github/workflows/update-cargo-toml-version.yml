@@ -21,6 +21,9 @@ jobs:
       - uses: actions/checkout@v3
       - run: |
           echo ${{ toJSON(inputs) }}
+      - run: |
+          echo $GITHUB_REF_NAME
+
       # - uses: actions-rs/toolchain@v1
       #   with:
       #     profile: minimal
@@ -42,7 +45,7 @@ jobs:
       #     # author_email: robot@meilisearch.com
       #     # author_email: ${{ secrets.MEILI_BOT_EMAIL }}
       #     message: "Update version for the next release ($NEW_VERSION) in Cargo.toml files"
-      #     new_branch: update-version-$NEW_VERSION
+      #     new_branch: update-version-${{ env.DAY_OF_WEEK }}
       # - name: Create the PR
       #   run: |
       #     gh pr create \
