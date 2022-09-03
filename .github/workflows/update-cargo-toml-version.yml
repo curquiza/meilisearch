@@ -20,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - run: |
-          echo {{ toJSON(inputs) }}
+          echo ${{ toJSON(inputs) }}
       # - uses: actions-rs/toolchain@v1
       #   with:
       #     profile: minimal
