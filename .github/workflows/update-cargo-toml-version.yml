@@ -32,14 +32,11 @@ jobs:
           raw_new_version=$(echo $NEW_VERSION | cut -d 'v' -f 2)
           new_string="version = \"$raw_new_version\""
           sd '^version = "\d+.\d+.\w+"$' "$new_string" */Cargo.toml
-      # - name: Build Meilisearch to update Cargo.lock
-      #   run: cargo build
-      - name: Commits and push the changes to the ${{ env.GITHUB_REF_NAME }} branch
+      - name: Build Meilisearch to update Cargo.lock
+        run: cargo build
+      - name: Commits and push the changes to the ${{ github.ref_name }} branch
         uses: EndBug/add-and-commit@v9
         with:
-          # author_name: Meili-Bot
-          # author_email: robot@meilisearch.com
-          # author_email: ${{ secrets.MEILI_BOT_EMAIL }}
           message: "Update version for the next release (${{ env.NEW_VERSION }}) in Cargo.toml files"
           new_branch: update-version-${{ env.NEW_VERSION }}
       - name: Create the PR
