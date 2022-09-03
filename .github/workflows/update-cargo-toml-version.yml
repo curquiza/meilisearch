@@ -34,16 +34,11 @@ jobs:
       - name: Build Meilisearch to update Cargo.lock
         run: cargo build
       - name: Commits and push the changes
-        run: |
-          git checkout -b "update-version-$NEW_VERSION"
-          git add .
-          git commit -m "Update version for the next release ($NEW_VERSION) in Cargo.toml files"
-          git push origin "update-version-$NEW_VERSION"
-      - uses: EndBug/add-and-commit@v9
+        uses: EndBug/add-and-commit@v9
         with:
           author_name: Meili-Bot
-          author_email: robot@meilisearch.com
-          # author_email: ${{ secrets.MEILI_BOT_EMAIL }}
+          # author_email: robot@meilisearch.com
+          author_email: ${{ secrets.MEILI_BOT_EMAIL }}
           message: "Update version for the next release ($NEW_VERSION) in Cargo.toml files"
           new_branch: update-version-{{ $NEW_VERSION }}
       - name: Create the PR
