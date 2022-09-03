@@ -28,6 +28,7 @@ jobs:
         run: cargo install sd
       - name: Update files
         run: |
+          echo "$GITHUB_REF_NAME"
           raw_new_version=$(echo $NEW_VERSION | cut -d 'v' -f 2)
           new_string="version = \"$raw_new_version\""
           sd '^version = "\d+.\d+.\w+"$' "$new_string" */Cargo.toml
