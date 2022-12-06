@@ -51,7 +51,7 @@ jobs:
     name: Publish binary for container ubuntu-18.04
     runs-on: ubuntu-latest
     container:
-      image: debian:10
+      image: rust:buster
     steps:
     - uses: hecrj/setup-rust-action@master
       with:
