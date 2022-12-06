@@ -51,7 +51,7 @@ jobs:
     name: Publish binary for container ubuntu-18.04
     runs-on: ubuntu-latest
     container:
-      image: rust:buster
+      image: rust:slim-buster
     steps:
     - uses: hecrj/setup-rust-action@master
       with:
