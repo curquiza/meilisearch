@@ -13,6 +13,8 @@ jobs:
     name: Publish binary for ubuntu-18.04
     runs-on: ubuntu-18.04
     steps:
+    - name: Display glibc version
+      run: ldd --version ldd
     - uses: hecrj/setup-rust-action@master
       with:
         rust-version: stable
@@ -32,6 +34,8 @@ jobs:
     name: Publish binary for ubuntu-20.04
     runs-on: ubuntu-20.04
     steps:
+    - name: Display glibc version
+      run: ldd --version ldd
     - uses: hecrj/setup-rust-action@master
       with:
         rust-version: stable
@@ -53,6 +57,8 @@ jobs:
     container:
       image: rust:slim-buster
     steps:
+    - name: Display glibc version
+      run: ldd --version ldd
     - uses: hecrj/setup-rust-action@master
       with:
         rust-version: stable
