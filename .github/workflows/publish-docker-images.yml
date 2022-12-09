@@ -24,8 +24,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - run: echo $STABLE_RELEASE_EVENT
-
       # Check only the validity of the tag for official releases (not for pre-releases or other tags)
       - name: Check release validity
         if: github.event_name == 'release' && env.STABLE == 'true'
@@ -61,15 +59,14 @@ jobs:
           flavor: latest=false
           tags: |
             type=ref,event=tag
-            type=raw,value=nightly,enable=${{ github.event_name == 'schedule' }}
-            type=semver,pattern=v{{major}}.{{minor}},enable=${{ github.event_name == 'release' && env.STABLE == 'true' }}
-            type=raw,value=latest,enable=${{ github.event_name == 'release' && env.STABLE == 'true' }}
+            type=raw,value=nightly,event=schedule
+            type=semver,pattern=v{{major}}.{{minor}},enable=${{ env.STABLE_RELEASE_EVENT == 'true' }}
+            type=raw,value=latest,enable=${{ env.STABLE_RELEASE_EVENT == 'true' }}
 
       # - name: Build and push
       #   uses: docker/build-push-action@v3
       #   with:
       #     # We do not push tags for the cron jobs, this is only for test purposes
-      #     push: ${{ github.event_name != 'schedule' }}
       #     platforms: linux/amd64,linux/arm64
       #     tags: ${{ steps.meta.outputs.tags }}
       #     build-args: |
@@ -78,10 +75,11 @@ jobs:
 
       # # /!\ Don't touch this without checking with Cloud team
       # - name: Send CI information to Cloud team
+      #   # Do not send if nightly build
       #   if: github.event_name != 'schedule'
       #   uses: peter-evans/repository-dispatch@v2
       #   with:
       #     token: ${{ secrets.MEILI_BOT_GH_PAT }}
       #     repository: meilisearch/meilisearch-cloud
       #     event-type: cloud-docker-build
-      #     client-payload: '{ "meilisearch_version": "${{ github.ref_name }}", "stable": "${{ env.STABLE == 'true' }}" }'
+      #     client-payload: '{ "meilisearch_version": "${{ github.ref_name }}", "stable": "${{ env.STABLE_RELEASE_EVENT == 'true' }}" }'
