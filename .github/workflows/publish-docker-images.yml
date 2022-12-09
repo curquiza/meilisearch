@@ -1,84 +1,88 @@
-# ---
-# on:
-#   schedule:
-#     - cron: '0 4 * * *' # Every day at 4:00am
-#   push:
-#     # Will run for every tag pushed except `latest`
-#     # When the `latest` git tag is created with this [CI](../latest-git-tag.yml)
-#     # we don't need to create a Docker `latest` image again.
-#     # The `latest` Docker image push is already done in this CI when releasing a stable version of Meilisearch.
-#     tags-ignore:
-#       - latest
+---
+on:
+  schedule:
+    - cron: '0 22 * * *' # Every day at 10:00pm
+  release:
+    types:
+      - published
+  push:
+    # Will run for every tag pushed except `latest`
+    # When the `latest` git tag is created with this [CI](../latest-git-tag.yml)
+    # we don't need to create a Docker `latest` image again.
+    # The `latest` Docker image push is already done in this CI when releasing a stable version of Meilisearch.
+    tags-ignore:
+      - latest
 
-# name: Publish tagged images to Docker Hub
+env:
+  STABLE_RELEASE_EVENT: ${{ github.event_name == 'release' && !github.event.release.prerelease }}
+  LATEST_RELEASE: ${{ github.event_name == 'release' && github.event.release.latest }}
 
-# jobs:
-#   docker:
-#     runs-on: docker
-#     steps:
-#       - uses: actions/checkout@v3
+name: Publish tagged images to Docker Hub
 
-#       # Check if the tag has the v<nmumber>.<number>.<number> format. If yes, it means we are publishing an official release.
-#       # In this situation, we need to set `output.stable` to create/update the following tags (additionally to the `vX.Y.Z` Docker tag):
-#       # - a `vX.Y` (without patch version) Docker tag
-#       # - a `latest` Docker tag
-#       - name: Check tag format
-#         if: github.event_name != 'schedule'
-#         id: check-tag-format
-#         run: |
-#           escaped_tag=$(printf "%q" ${{ github.ref_name }})
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
 
-#           if [[ $escaped_tag =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-#             echo "stable=true" >> $GITHUB_OUTPUT
-#           else
-#             echo "stable=false" >> $GITHUB_OUTPUT
-#           fi
+      - run: echo $LATEST_RELEASE
 
-#       # Check only the validity of the tag for official releases (not for pre-releases or other tags)
-#       - name: Check release validity
-#         if: github.event_name != 'schedule' && steps.check-tag-format.outputs.stable == 'true'
-#         run: bash .github/scripts/check-release.sh
+      # Check only the validity of the tag for official releases (not for pre-releases or other tags)
+      - name: Check release validity
+        if: env.STABLE_RELEASE_EVENT == 'true'
+        run: bash .github/scripts/check-release.sh
 
-#       - name: Set up QEMU
-#         uses: docker/setup-qemu-action@v2
+      - name: Set build-args for Docker buildx
+        id: build-metadata
+        run: |
+          # Extract commit date
+          commit_date=$(git show -s --format=%cd --date=iso-strict ${{ github.sha }})
 
-#       - name: Set up Docker Buildx
-#         uses: docker/setup-buildx-action@v2
+          echo "date=$commit_date" >> $GITHUB_OUTPUT
 
-#       - name: Login to Docker Hub
-#         if: github.event_name != 'schedule'
-#         uses: docker/login-action@v2
-#         with:
-#           username: ${{ secrets.DOCKERHUB_USERNAME }}
-#           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
 
-#       - name: Docker meta
-#         id: meta
-#         uses: docker/metadata-action@v4
-#         with:
-#           images: getmeili/meilisearch
-#           # The latest and `vX.Y` tags are only pushed for the official Meilisearch releases
-#           # See https://github.com/docker/metadata-action#latest-tag
-#           flavor: latest=false
-#           tags: |
-#             type=ref,event=tag
-#             type=semver,pattern=v{{major}}.{{minor}},enable=${{ steps.check-tag-format.outputs.stable == 'true' }}
-#             type=raw,value=latest,enable=${{ steps.check-tag-format.outputs.stable == 'true' }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
-#       - name: Build and push
-#         uses: docker/build-push-action@v3
-#         with:
-#           # We do not push tags for the cron jobs, this is only for test purposes
-#           push: ${{ github.event_name != 'schedule' }}
-#           platforms: linux/amd64,linux/arm64
-#           tags: ${{ steps.meta.outputs.tags }}
+      # - name: Login to Docker Hub
+      #   uses: docker/login-action@v2
+      #   with:
+      #     username: ${{ secrets.DOCKERHUB_USERNAME }}
+      #     password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-#       # /!\ Don't touch this without checking with Cloud team
-#       - name: Send CI information to Cloud team
-#         if: github.event_name != 'schedule'
-#         uses: peter-evans/repository-dispatch@v2
-#         with:
-#           token: ${{ secrets.MEILI_BOT_GH_PAT }}
-#           repository: meilisearch/meilisearch-cloud
-#           event-type: cloud-docker-build
-#           client-payload: '{ "meilisearch_version": "${{ github.ref_name }}", "stable": "${{ steps.check-tag-format.outputs.stable }}" }'
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: getmeili/meilisearch
+          # The latest and `vX.Y` tags are only pushed for the official Meilisearch releases
+          # See https://github.com/docker/metadata-action#latest-tag
+          flavor: latest=false
+          tags: |
+            type=ref,event=tag
+            type=raw,value=nightly,enable=${{ github.event_name == 'schedule' }}
+            type=semver,pattern=v{{major}}.{{minor}},enable=${{ env.STABLE_RELEASE_EVENT == 'true' }}
+            type=raw,value=latest,enable=${{ env.STABLE_RELEASE_EVENT == 'true' && env.LATEST_RELEASE == 'true' }}
+
+      # - name: Build and push
+      #   uses: docker/build-push-action@v3
+      #   with:
+      #     # We do not push tags for the cron jobs, this is only for test purposes
+      #     platforms: linux/amd64,linux/arm64
+      #     tags: ${{ steps.meta.outputs.tags }}
+      #     build-args: |
+      #       COMMIT_SHA=${{ github.sha }}
+      #       COMMIT_DATE=${{ steps.build-metadata.outputs.date }}
+
+      # # /!\ Don't touch this without checking with Cloud team
+      # - name: Send CI information to Cloud team
+      #   # Do not send if nightly build
+      #   if: github.event_name != 'schedule'
+      #   uses: peter-evans/repository-dispatch@v2
+      #   with:
+      #     token: ${{ secrets.MEILI_BOT_GH_PAT }}
+      #     repository: meilisearch/meilisearch-cloud
+      #     event-type: cloud-docker-build
+      #     client-payload: '{ "meilisearch_version": "${{ github.ref_name }}", "stable": "${{ env.STABLE_RELEASE_EVENT == 'true' }}" }'
