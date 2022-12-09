@@ -24,6 +24,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - run: echo $STABLE_RELEASE_EVENT
+
       # Check only the validity of the tag for official releases (not for pre-releases or other tags)
       - name: Check release validity
         if: env.STABLE_RELEASE_EVENT == 'true'
