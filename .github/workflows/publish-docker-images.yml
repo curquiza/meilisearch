@@ -14,8 +14,7 @@ on:
       - latest
 
 env:
-  STABLE: ${{ !github.event.release.prerelease }}
-  PRERELEASE: ${{ github.event.release.prerelease }}
+  STABLE_RELEASE_EVENT: ${{ github.event_name == 'release' && !github.event.release.prerelease }}
 
 name: Publish tagged images to Docker Hub
 
@@ -25,8 +24,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - run: echo $STABLE
-      - run: echo $PRERELEASE
+      - run: echo $STABLE_RELEASE_EVENT
+
       # Check only the validity of the tag for official releases (not for pre-releases or other tags)
       - name: Check release validity
         if: github.event_name == 'release' && env.STABLE == 'true'
@@ -62,9 +61,9 @@ jobs:
           flavor: latest=false
           tags: |
             type=ref,event=tag
-            type=semver,pattern=v{{major}}.{{minor}},enable=${{ env.STABLE == 'true' }}
-            type=raw,value=latest,enable=${{ env.STABLE == 'true' }}
             type=raw,value=nightly,enable=${{ github.event_name == 'schedule' }}
+            type=semver,pattern=v{{major}}.{{minor}},enable=${{ github.event_name == 'release' && env.STABLE == 'true' }}
+            type=raw,value=latest,enable=${{ github.event_name == 'release' && env.STABLE == 'true' }}
 
       # - name: Build and push
       #   uses: docker/build-push-action@v3
