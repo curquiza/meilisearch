@@ -24,6 +24,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - run: echo $STABLE
       # Check only the validity of the tag for official releases (not for pre-releases or other tags)
       - name: Check release validity
         if: github.event_name == 'release' && env.STABLE == 'true'
