@@ -2,9 +2,6 @@
 on:
   schedule:
     - cron: '0 22 * * *' # Every day at 10:00pm
-  release:
-    types:
-      - published
   push:
     # Will run for every tag pushed except `latest`
     # When the `latest` git tag is created with this [CI](../latest-git-tag.yml)
@@ -12,9 +9,12 @@ on:
     # The `latest` Docker image push is already done in this CI when releasing a stable version of Meilisearch.
     tags-ignore:
       - latest
+  release:
+    types:
+      - published
 
 env:
-  STABLE_RELEASE_EVENT: ${{ github.event_name == 'release' && !github.event.release.prerelease }}
+  STABLE_RELEASE_EVENT: ${{ github.event_name == 'release' && github.event.release.prerelease == 'false' }}
 
 name: Publish tagged images to Docker Hub
 
