@@ -15,6 +15,7 @@ on:
 
 env:
   STABLE_RELEASE_EVENT: ${{ github.event_name == 'release' && !github.event.release.prerelease }}
+  LATEST_RELEASE: ${{ github.event_name == 'release' && github.event.release.latest }}
 
 name: Publish tagged images to Docker Hub
 
@@ -23,6 +24,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
+      - run: echo $LATEST_RELEASE
 
       # Check only the validity of the tag for official releases (not for pre-releases or other tags)
       - name: Check release validity
@@ -59,9 +62,9 @@ jobs:
           flavor: latest=false
           tags: |
             type=ref,event=tag
-            type=raw,value=nightly,event=schedule
+            type=raw,value=nightly,enable=${{ github.event_name == 'schedule' }}
             type=semver,pattern=v{{major}}.{{minor}},enable=${{ env.STABLE_RELEASE_EVENT == 'true' }}
-            type=raw,value=latest,enable=${{ env.STABLE_RELEASE_EVENT == 'true' }}
+            type=raw,value=latest,enable=${{ env.STABLE_RELEASE_EVENT == 'true' && env.LATEST_RELEASE == 'true' }}
 
       # - name: Build and push
       #   uses: docker/build-push-action@v3
