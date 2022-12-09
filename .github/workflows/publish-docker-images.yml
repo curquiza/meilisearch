@@ -11,7 +11,7 @@ on:
       - latest
   release:
     types:
-      - published
+      - released
 
 env:
   STABLE_RELEASE_EVENT: ${{ github.event_name == 'release' && github.event.release.prerelease == 'false' }}
