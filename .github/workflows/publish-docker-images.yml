@@ -26,7 +26,7 @@ jobs:
 
       # Check only the validity of the tag for official releases (not for pre-releases or other tags)
       - name: Check release validity
-        if: github.event_name == 'release' && env.STABLE == 'true'
+        if: env.STABLE_RELEASE_EVENT == 'true'
         run: bash .github/scripts/check-release.sh
 
       - name: Set build-args for Docker buildx
