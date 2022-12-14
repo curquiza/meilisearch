@@ -60,7 +60,10 @@ jobs:
         rust-version: stable
     - uses: actions/checkout@v3
     - name: Install rustup
-      run: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+      run: |
+        apt-get update && apt-get install -y curl
+        apt-get install build-essential -y
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
     - name: Build
       run: cargo build --release --locked
     # No need to upload binaries for dry run (cron)
