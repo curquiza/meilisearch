@@ -67,7 +67,11 @@ jobs:
       with:
         toolchain: stable
         override: true
-        components: build
+    - name: Run cargo check
+      uses: actions-rs/cargo@v1
+      with:
+        command: build
+        args: --release --locked
     - name: Build
       run: cargo build --release --locked
     # No need to upload binaries for dry run (cron)
