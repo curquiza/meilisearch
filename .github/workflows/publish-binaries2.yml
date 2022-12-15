@@ -60,18 +60,10 @@ jobs:
       run: |
         apt-get update && apt-get install -y curl
         apt-get install build-essential -y
-      # run: |
-      #   apt-get update && apt-get install -y curl
-      #   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
     - uses: actions-rs/toolchain@v1
       with:
         toolchain: stable
         override: true
-    - name: Run cargo build
-      uses: actions-rs/cargo@v1
-      with:
-        command: build
-        args: --release --locked
     - name: Build
       run: cargo build --release --locked
     # No need to upload binaries for dry run (cron)
