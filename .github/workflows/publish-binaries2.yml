@@ -61,9 +61,7 @@ jobs:
         apt-get update && apt-get install -y curl
         apt-get install build-essential -y
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-    - uses: hecrj/setup-rust-action@master
-      with:
-        rust-version: stable
+    - uses: actions-rs/toolchain@v1
     - name: Build
       run: cargo build --release --locked
     # No need to upload binaries for dry run (cron)
