@@ -22,7 +22,7 @@ jobs:
     # No need to upload binaries for dry run (cron)
     - name: Upload binaries to release
       if: github.event_name == 'release'
-      uses: svenstaro/upload-release-action@2.3.0
+      uses: svenstaro/upload-release-action@2.5.0
       with:
         repo_token: ${{ secrets.MEILI_BOT_GH_PAT }}
         file: target/release/meilisearch
@@ -42,7 +42,7 @@ jobs:
     # No need to upload binaries for dry run (cron)
     - name: Upload binaries to release
       if: github.event_name == 'release'
-      uses: svenstaro/upload-release-action@2.3.0
+      uses: svenstaro/upload-release-action@2.5.0
       with:
         repo_token: ${{ secrets.MEILI_BOT_GH_PAT }}
         file: target/release/meilisearch
@@ -69,7 +69,7 @@ jobs:
     # No need to upload binaries for dry run (cron)
     - name: Upload binaries to release
       if: github.event_name == 'release'
-      uses: svenstaro/upload-release-action@2.3.0
+      uses: svenstaro/upload-release-action@2.5.0
       with:
         repo_token: ${{ secrets.MEILI_BOT_GH_PAT }}
         file: target/release/meilisearch
